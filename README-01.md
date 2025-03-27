@@ -72,7 +72,11 @@ resource "azurerm_resource_group" "workshop_rg" {
 Execute:
 ```bash
 terraform init
+terraform validate
 terraform plan
 terraform apply
 ```
 Verify in the Azure Portal that the resource group was created
+
+## Questions
+1. How can you avoid having to input the Subscription Id with every command?
