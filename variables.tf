@@ -4,6 +4,14 @@ variable "subscription_id" {
   type        = string
 }
 
+variable "environment" { 
+  description  = "Then environment"
+  type         = string
+  default = "dev"
+}
+
+
+
 # Resource Group
 variable "resource_group_name" {
   description = "Name of the resource group"
