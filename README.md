@@ -1,82 +1,61 @@
-# terraform first steps
+# terraform first steps - part 02
 
-## Initial Setup
-1. Create a directory for the workshop
-2. Authenticate with Azure
-   ```bash
-   az login
+## STEP 2: Add Virtual Network & Subnets
 
-## Instructions
-### STEP 1: Setup Project & Resource Group
-
-Begin with an empty main.tf file and add the provider with your subscription ID:
+Add the networking variables to variables.tf
 ```hcl
-# Configure the Azure provider
-provider "azurerm" {
-  subscription_id = "77163967-ced7-400c-8c49-25cd108bea77"
-  features {}
-}
-```
-Create the basic structure of variables.tf
-```hcl
-# Provider Configuration
-variable "subscription_id" {
-  description = "The Azure subscription ID"
+# Networking
+variable "vnet_name" {
+  description = "Name of the virtual network"
   type        = string
-  # No default provided as this should be explicitly set per environment
+  default     = "workshop-vnet"
 }
 
-variable "resource_group_name" {
-  description = "Name of the resource group"
-  type        = string
-  default     = "tf-workshop-rg"
+variable "address_space" {
+  description = "Address space for the virtual network"
+  type        = list(string)
+  default     = ["10.0.0.0/16"]
 }
 
-variable "location" {
-  description = "Azure region to deploy resources"
-  type        = string
-  default     = "westeurope"
-}
-
-variable "tags" {
-  description = "Tags to apply to all resources"
-  type        = map(string)
-  default     = {
-    environment = "workshop"
-    managed_by  = "terraform"
-  }
+variable "subnet_prefixes" {
+  description = "Address prefixes for the subnets"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
 }
 ```
-
-Create a terraform.tfvars file
+Optional: Update terraform.tfvars with network values
 ```hcl
-resource_group_name = "tf-workshop-rg"
-location            = "westeurope"
-tags                = {
-  environment = "workshop"
-  managed_by  = "terraform"
-  created_by  = "student"
-}
+# Networking
+vnet_name           = "workshop-vnet"
+address_space       = ["10.0.0.0/16"]
+subnet_prefixes     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
 ```
 
-Add the resource group block to main.tf:
+Add the virtual network and subnet resources to main.tf
 ```hcl
-# STEP 1: Create a resource group
-resource "azurerm_resource_group" "workshop_rg" {
-  name     = var.resource_group_name
-  location = var.location
-  tags     = var.tags
+# STEP 2: Create a virtual network
+resource "azurerm_virtual_network" "workshop_vnet" {
+  name                = var.vnet_name
+  resource_group_name = azurerm_resource_group.workshop_rg.name
+  location            = azurerm_resource_group.workshop_rg.location
+  address_space       = var.address_space
+  tags                = var.tags
 }
-```
 
+# Create three subnets
+resource "azurerm_subnet" "web_subnet" {
+  name                 = "web-subnet"
+  resource_group_name  = azurerm_resource_group.workshop_rg.name
+  virtual_network_name = azurerm_virtual_network.workshop_vnet.name
+  address_prefixes     = [var.subnet_prefixes[0]]
+}
+
+# ... app_subnet and data_subnet blocks
+```
 Execute:
 ```bash
-terraform init
-terraform validate
 terraform plan
 terraform apply
 ```
-Verify in the Azure Portal that the resource group was created
 
-## Questions
-1. How can you avoid having to input the Subscription Id with every command?
+Verify the Network resources in the Azure Portal
