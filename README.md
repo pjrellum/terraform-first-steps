@@ -13,7 +13,7 @@ Begin with an empty main.tf file and add the provider with your subscription ID:
 ```hcl
 # Configure the Azure provider
 provider "azurerm" {
-  subscription_id = var.subscription_id
+  subscription_id = "77163967-ced7-400c-8c49-25cd108bea77"
   features {}
 }
 ```
