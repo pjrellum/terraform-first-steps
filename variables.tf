@@ -23,5 +23,6 @@ variable "tags" {
   default     = {
     environment = "workshop"
     managed_by  = "terraform"
+    created_by  = "student"
   }
 }
